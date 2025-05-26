@@ -1,0 +1,15 @@
+# venv / IDE
+.venv/
+.vscode/
+
+# output runtime
+logs/
+checkpoints/
+__pycache__/
+
+# dati notebook
+*.ipynb_checkpoints/
+
+# PyTorch / TensorBoard
+*.pt
+*.tfevents*
