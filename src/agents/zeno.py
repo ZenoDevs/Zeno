@@ -8,9 +8,9 @@ log = get_logger(__name__)
 DEVICE = "cpu"  # metti "cuda" se hai GPU
 
 class ZenoAgent:
-    def __init__(self, state_dim=3, lr=1e-2):
+    def __init__(self, state_dim=4, lr=1e-2):
         self.vocab_size = len(TOKEN2ID)
-        self.net = PolicyNet(state_dim, self.vocab_size).to(DEVICE)
+        self.net = PolicyNet( state_dim, self.vocab_size).to(DEVICE)
         self.opt = torch.optim.Adam(self.net.parameters(), lr=lr)
 
     def act(self, state):

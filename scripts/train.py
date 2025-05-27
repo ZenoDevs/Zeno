@@ -9,12 +9,11 @@ if __name__ == "__main__":
     tbw     = get_tb_writer()                 # ottieni il writer con logica runN
 
     env   = GridWorld()
-    agent = ZenoAgent()
+    # qui specifichiamo state_dim=4
+    zeno  = ZenoAgent(state_dim=4, lr=1e-2)
+    loop  = ReinforceTrainer(env, zeno,
+                             episodes = 2000,
+                             max_steps= 50,    # più rapido
+                             gamma    = 0.99)
 
-    trainer = ReinforceTrainer(env, agent,
-                               episodes  = 1000,
-                               gamma     = 0.99,
-                               max_steps = 100,
-                               tb_writer = tbw)   # passa il writer
-
-    trainer.run()
+    loop.run()

@@ -9,10 +9,16 @@ log = get_logger(__name__)
 
 TARGET_TOKEN = "acqua"
 
-def mother_reply(token: str, still_thirsty: bool):
-    if still_thirsty and token == TARGET_TOKEN:
-        log.info("Madre: ho sentito '%s' → do acqua (+1)", token)
+def mother_reply(token: str, is_thirsty: bool, is_hungry: bool):
+    """
+    Reward = 1 se:
+      - is_thirsty and token=='acqua'
+      - is_hungry  and token=='cibo'
+    """
+    if is_thirsty and token == "acqua":
+        log.info("Madre: ho sentito 'acqua' → do acqua (+1)")
         return True, 1.0
-    # nessun reward
+    if is_hungry and token == "cibo":
+        log.info("Madre: ho sentito 'cibo' → do cibo (+1)")
+        return True, 1.0
     return False, 0.0
-

@@ -15,10 +15,17 @@ class GridWorld:
         self.reset()
 
     def reset(self):
-        self.pos = np.array([0, 0])   # angolo in alto a sinistra
-        self.thirst = True
+        self.pos = np.array([0, 0])
+        # scegli a caso un bisogno: 0 = sete, 1 = fame
+        if np.random.rand() < 0.5:
+            self.need = "thirst"
+        else:
+            self.need = "hunger"
+        # due flag booleane 
+        self.thirst = (self.need == "thirst")
+        self.hunger = (self.need == "hunger")
         self.terminated = False
-        log.info("Env reset: Zeno @%s  sete=%s", self.pos, self.thirst)
+        log.info("Zeno reset: pos=%s, need=%s", self.pos, self.need)
         return self._state()
 
     def step(self, action: str):
@@ -32,9 +39,10 @@ class GridWorld:
         if action.startswith("speak:"):
             token = action.split(":", 1)[1]
             from ..agents.mother import mother_reply
-            given, reward = mother_reply(token, self.thirst)
+            given, reward = mother_reply(token, self.thirst, self.hunger)
             if given:
                 self.thirst = False
+                self.hunger = False
                 self.terminated = True
         else:
             reward = -0.1
@@ -43,7 +51,9 @@ class GridWorld:
 
     # ---------- helpers ----------
     def _state(self):
-        # vettore NumPy per la NN (x, y, thirsty_flag)
-        return np.array([*self.pos, int(self.thirst)], dtype=np.float32)
-
+        # [x, y, thirst_flag, hunger_flag]
+        return np.array([*self.pos,
+                         int(self.thirst),
+                         int(self.hunger)],
+                        dtype=np.float32)
    
