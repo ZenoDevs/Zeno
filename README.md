@@ -1,23 +1,23 @@
-# Zeno – Need-Driven Language Emergence
+# Zeno – Need-Driven Language Emergence (Training on Italian)
 
-Zeno è un sandbox di ricerca in cui un agente virtuale impara a usare il linguaggio **per soddisfare bisogni primari** (sete, fame, ecc.).  
-Il linguaggio non viene fornito “già saputo”: emerge gradualmente perché l’agente riceve ricompense solo quando comunica in modo utile.
+Zeno is a research sandbox where a virtual agent learns to use language **to satisfy primary needs** (thirst, hunger, etc.).  
+The language is **not** provided “pre-wired”: it emerges gradually because the agent only receives rewards when it communicates usefully—in **Italian**.
 
 ---
 
 ## Scope
 
-| Stadio | Obiettivo principale           | Esempio di frase target           |
-| ------ | ------------------------------ | --------------------------------- |
-| 1      | Bisogno singolo, token singolo | `acqua`                           |
-| 2      | Disambiguazione                | `acqua blu`                       |
-| 3      | Bisogni multipli               | `voglio acqua blu e cibo`         |
-| 4      | Frasi articolate               | `voglio acqua blu perché ho sete` |
-| 5      | Dialogo a turni / cooperazione | `vai a destra, lì c'è il cibo`    |
+| Stage | Main Goal                         | Example Target Phrase             |
+| ----- | --------------------------------- | --------------------------------- |
+| 1     | Single need, single token         | `acqua`                           |
+| 2     | Disambiguation                    | `acqua blu`                       |
+| 3     | Multiple needs                    | `voglio acqua blu e cibo`         |
+| 4     | Articulated sentences             | `voglio acqua blu perché ho sete` |
+| 5     | Turn-based dialogue / cooperation | `vai a destra, lì c’è il cibo`    |
 
 ---
 
-## Project structure
+## Project Structure
 
 ```text
 zeno/
@@ -45,7 +45,7 @@ zeno/
 │   │   └── trainer.py
 │   ├── utils/
 │   │   ├── logger.py
-|   |   |── tb.py
+│   │   ├── tb.py
 │   │   ├── tokenization.py
 │   │   └── visualization.py
 │   └── main.py
@@ -56,45 +56,28 @@ zeno/
 ├── checkpoints/
 └── data/
     └── vocab.json
-```
 
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/train.py --config configs/base.yaml
+python -m scripts.train --config configs/base.yaml
 tensorboard --logdir logs/tensorboard
 
----
 
-## 2. Guida rapida “Folder & File” (cosa serve a cosa)
-
-| Percorso                              | A cosa serve – **parti da qui se…**                                                                        |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **configs/**                          | YAML con hyper-parametri. Crea file diversi per esperimenti.                                               |
-| **scripts/train.py**                  | Entry-point CLI: legge un config, avvia trainer. PUNTO DI PARTENZA per far girare il prototipo.            |
-| **scripts/visualize.py**              | Replay grafico/ascii di un episodio già salvato. Utile per debugging.                                      |
-| **src/env/gridworld.py**              | Logica dell’ambiente: griglia, stato sete/fame, `step()` e `reset()`. È il **primo file da implementare**. |
-| **src/agents/zeno.py**                | Policy dell’agente che impara. Inizia con scelte random → poi rete PyTorch.                                |
-| **src/agents/mother.py**              | “Madre” che valuta frasi e restituisce reward. All’inizio è hard-coded.                                    |
-| **src/rl/policy.py** / **trainer.py** | Algoritmo RL generico (REINFORCE o PPO). Puoi usare un’implementazione minimale qui.                       |
-| **src/utils/logger.py**               | Wrapper su `logging` + colori; centralizza tutti i log.                                                    |
-| **src/utils/tokenization.py**         | Mapping parola ↔ ID; in futuro BPE/SentencePiece.                                                          |
-| **src/utils/visualization.py**        | Funzioni per disegnare la griglia con Rich o PyGame.                                                       |
-| **notebooks/**                        | Playground esplorativo: prova reward, grafici veloci.                                                      |
-| **logs/**                             | Output runtime (stdout, metriche CSV, TensorBoard).                                                        |
-| **checkpoints/**                      | Modelli `.pt` salvati dal trainer.                                                                         |
-| **data/vocab.json**                   | Lista token editabile a mano; punto centrale per aggiungere vocaboli.                                      |
-
----
-
-### **Da dove partire concretamente**
-
-1. **Implementa `src/env/gridworld.py`** con un ambiente 3×3, stato `sete`, reward su token `"acqua"`.
-2. **Scrivi `src/agents/mother.py`** hard-coded: se token == `"acqua"` → reward; altrimenti 0.
-3. **Implementa un trainer minimale in `src/rl/trainer.py`** che usa REINFORCE.
-4. **Lancia `scripts/train.py`** e guarda i log / TensorBoard.
-5. Quando vedi il reward salire → passa allo Step 2 della roadmap (disambiguation).
-
----
-
-Con queste note hai README pronto e una spiegazione chiara di ogni pezzo.  
-Se vuoi raffinare qualcosa o hai domande su un file specifico, dimmi pure!
+| Path                                  | Purpose                                                                                                               |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **configs/**                          | YAML files for hyper-parameters. Create a new config for each experiment.                                             |
+| **scripts/train.py**                  | CLI entry-point: loads a config, instantiates the trainer & agent. **Your starting point for running the prototype.** |
+| **scripts/visualize.py**              | Graphical/ASCII replay of a saved episode—useful for debugging.                                                       |
+| **src/env/gridworld.py**              | Environment logic: 3×3 grid, thirst/hunger flags, `step()` & `reset()`. **First file to implement.**                  |
+| **src/agents/zeno.py**                | Agent’s policy: initially random, then a PyTorch network.                                                             |
+| **src/agents/mother.py**              | “Mother” oracle: hard-coded reward logic.                                                                             |
+| **src/rl/policy.py** & **trainer.py** | Core RL algorithm (REINFORCE/PPO). A minimal implementation here.                                                     |
+| **src/utils/logger.py**               | Colored‐output `logging` wrapper; centralizes all logs.                                                               |
+| **src/utils/tb.py**                   | Factory for TensorBoard `SummaryWriter` with automatic run-naming.                                                    |
+| **src/utils/tokenization.py**         | Word ↔ ID mapping; replaceable later with BPE/SentencePiece.                                                          |
+| **src/utils/visualization.py**        | Grid‐drawing utilities (Rich, PyGame).                                                                                |
+| **notebooks/**                        | Exploratory notebook for quick reward tests and plots.                                                                |
+| **logs/**                             | Runtime outputs (stdout, CSV metrics, TensorBoard events).                                                            |
+| **checkpoints/**                      | Saved model `.pt` checkpoints.                                                                                        |
+| **data/vocab.json**                   | Editable vocabulary file (list of tokens).                                                                            |
+```
